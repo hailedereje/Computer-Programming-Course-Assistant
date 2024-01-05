@@ -57,7 +57,7 @@ const page = ({signIn} : SignInProps) => {
 
   const onSubmit = async (values : z.infer<typeof signInSchema>) => {
       const login = async(url: string) => {
-        const loginInfo : NextResponse= await axios.post(url,values);
+        const loginInfo : NextResponse = await axios.post(url,values);
         console.log(loginInfo.status)
         router.refresh();
       }

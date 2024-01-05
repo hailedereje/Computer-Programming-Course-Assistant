@@ -7,11 +7,10 @@ interface LoginResponse{
 }
 
 import { RegisterSchema } from '@/schemas/zod-validation';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
 import * as z from 'zod';
-import { db } from "@/lib/db";
 import { createUser, getUserByEmail } from "@/data/user";
+import { generateVarificationToken } from "@/lib/tokens";
+import { sendEmail } from "@/utils/email";
 
 export async function register (values : z.infer<typeof RegisterSchema>):Promise<LoginResponse>{
     const validateFields = RegisterSchema.safeParse(values);
@@ -26,6 +25,14 @@ export async function register (values : z.infer<typeof RegisterSchema>):Promise
     if(existingUser) return {error: "email already in use!"};
 
     await createUser(name,email,hashedPassword);
-    return {success:`User Created`}
+    
+    const varificationToken = await generateVarificationToken(email);
+    try{
+        const token = await sendEmail(varificationToken.email,varificationToken.token);
+    }catch{
+        return {error:"Connection problems try again"}
+    }
+        
+    return {success:`conformation email sent !`}
      
 }   

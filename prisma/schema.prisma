@@ -6,10 +6,15 @@ generator client {
 }
 
 // prisma/schema.prisma
+// datasource db {
+//   provider  = "postgresql"
+//   url  	    = env("DATABASE_URL")
+//   directUrl = env("DIRECT_URL")
+// }
+
 datasource db {
-  provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider  = "mysql"
+  url  	    = env("DATABASE_URL_LOCAL")
 }
 
 enum UserRole {
@@ -44,4 +49,12 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+}
+
+model VarficationToken{
+  id String @id @default(cuid())
+  email String 
+  token String @unique
+  expiresAt DateTime
+  @@unique([email,token])
 }

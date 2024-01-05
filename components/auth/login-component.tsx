@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useRouter } from "next/navigation";
 
 interface LoginProps {
@@ -12,7 +13,7 @@ export const LoginComponent = (
     {children,mode="redirect",asChild} : LoginProps
     ) => {
         const router = useRouter();
-        const onClick = () => {
+        const onClick = async () => {
             router.push("/auth/login")
         }
         return (

@@ -12,7 +12,6 @@ const ErrorPage = ()=>{
             headerLabel="Ooops something went wrong !"
             backButtonHref="/auth/login"
             backButtonLabel="Back to login"
-            showSocial={false}
         >
             <div className="w-full flex justify-center items-center">
                 <AlertTriangle className="text-destructive"/>

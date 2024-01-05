@@ -13,13 +13,12 @@ import {
     FormField
 } from "@/components/ui/form"
 import { CardWrapper } from "./card-wrapper";
-import { SignInProps, SignUpProps } from "@/schemas";
+import { SignUpProps } from "@/schemas";
 
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { LoginSchema, RegisterSchema } from "@/schemas/zod-validation";
-import { FormError, FormSuccess } from "./form-error";
-import { login } from "@/actions/login";
+import { RegisterSchema } from "@/schemas/zod-validation";
+import { FormError, FormSuccess } from "./form-message";
 import { useState, useTransition } from "react";
 import { Loader2Icon } from "lucide-react";
 import { register } from "@/actions/register";
@@ -49,7 +48,6 @@ export default function RegisterForm({signUp}:SignUpProps){
                 setSuccess(data.success)
             })  
         )
-        console.log(isValid)
     }
     return (
         <CardWrapper

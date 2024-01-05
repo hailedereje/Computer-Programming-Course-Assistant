@@ -18,7 +18,7 @@ import { SignInProps } from "@/schemas";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { LoginSchema } from "@/schemas/zod-validation";
-import { FormError, FormSuccess } from "./form-error";
+import { FormError, FormSuccess } from "./form-message";
 import { login } from "@/actions/login";
 import { useState, useTransition } from "react";
 import { Loader2Icon } from "lucide-react";
