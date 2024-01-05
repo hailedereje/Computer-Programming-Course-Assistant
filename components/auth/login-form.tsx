@@ -13,7 +13,6 @@ import {
     FormField
 } from "@/components/ui/form"
 import { CardWrapper } from "./card-wrapper";
-import { SignInProps } from "@/schemas";
 
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -23,9 +22,10 @@ import { login } from "@/actions/login";
 import { useState, useTransition } from "react";
 import { Loader2Icon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 
-export default function LoginForm({signIn}:SignInProps){
+export default function LoginForm(){
     
     const searchParams = useSearchParams();
     const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ? "Email already in use with Differnt login provider":"";
@@ -37,7 +37,10 @@ export default function LoginForm({signIn}:SignInProps){
 
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
-        defaultValues:signIn
+        defaultValues:{
+            email: "",
+            password: ""
+        }
     });
 
     const onSubmit = (values : z.infer<typeof LoginSchema>) => {
@@ -69,7 +72,12 @@ export default function LoginForm({signIn}:SignInProps){
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
-                                       <Input disabled={isPending} {...field} placeholder="example@gmail.com"/> 
+                                       <Input 
+                                            autoComplete="off"
+                                            type="text" 
+                                            disabled={isPending} 
+                                            {...field} 
+                                            placeholder="example@gmail.com"/> 
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem> 
@@ -83,8 +91,16 @@ export default function LoginForm({signIn}:SignInProps){
                                 <FormItem>
                                     <FormLabel>Password</FormLabel>
                                     <FormControl>
-                                       <Input disabled={isPending} {...field} placeholder="******"/> 
+                                       <Input 
+                                            autoComplete="password"
+                                            type="password"
+                                            disabled={isPending} 
+                                            {...field} 
+                                            placeholder="******"/> 
                                     </FormControl>
+                                    <Button variant={"link"} size={"sm"} className="px-0 text-sm text-blue-400" asChild>
+                                        <Link href={"/auth/reset"}>Forgot password ?</Link>
+                                    </Button>
                                     <FormMessage/>
                                 </FormItem> 
                             )}

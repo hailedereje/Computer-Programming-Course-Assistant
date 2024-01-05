@@ -1,24 +1,18 @@
 import { db } from "@/lib/db"
 import bcrypt from "bcryptjs";
 import { deleteVarificationToken } from "./varification-token";
+import { deletePasswordResetToken } from "./password-reset";
 
 export const createUser = async(name: string,email: string,password: string) => {
     
-    const user = await db.user.create({ data: { name,email,password } })
+     await db.user.create({ data: { name,email,password } })
 }
 export const getUserByEmail = async(email : string) => {
-
-    const user = await db.user.findFirst({ where: { email } });
-    if(!user) return null;
-    return user;
-    
+        return await db.user.findFirst({ where: { email } });          
 }
 
 export const getUserById = async(id : string) => {
-    const user = await db.user.findUnique({ where: { id } });
-    if(!user) return null;
-    return user;
-   
+        return await db.user.findUnique({ where: { id } });
 }
 
 export const compareUserPassword = async(password: string,hashedPassword: string) =>{
@@ -27,14 +21,19 @@ export const compareUserPassword = async(password: string,hashedPassword: string
 }
 
 export const varifyUserEmail = async(id: string,email: string,tokenId: string) =>{
-    try{
+    
         await db.user.update({
             where: {id},
             data: {
                 emailVerified: new Date(),
                 email }})
         await deleteVarificationToken(tokenId);
-    }catch {
-        return null;
-    }
+    
+}
+
+export const resetPassword = async (id: string,password: string,tokenId: string) =>{
+        const hashedPassword =await bcrypt.hash(password,10)
+        await db.user.update({where: {id},data:{password: hashedPassword}} );
+        await deletePasswordResetToken(tokenId)
+        
 }

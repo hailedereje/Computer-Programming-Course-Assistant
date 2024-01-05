@@ -16,3 +16,7 @@ export interface SignUpProps{
 export interface FormErrorProps{
     message?: string
 }
+
+export interface ResetProps{
+  email: string
+}

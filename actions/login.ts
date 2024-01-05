@@ -25,13 +25,12 @@ export async function login (values : z.infer<typeof LoginSchema> ) : Promise<Lo
     
     if(!existingUser.emailVerified){
         const varification = await generateVarificationToken(existingUser.email)
-        // try{
-            const token = await sendEmail(email,varification?.token);
-            console.log(token);
+        try{
+            await sendEmail(email,varification?.token);
         
-        // }catch{
-        //     return {error:"Connection problems try again"}
-        // }
+        }catch{
+            return {error:"Connection problems try again"}
+        }
         
         return {success: "Confirmation email sent!"}
     }
