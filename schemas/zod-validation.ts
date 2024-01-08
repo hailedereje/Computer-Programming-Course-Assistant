@@ -2,7 +2,8 @@ import * as z from 'zod';
 
 export const LoginSchema = z.object({
     email: z.string({required_error: "Email Field Required"}).email(),
-    password: z.string({required_error: "Password Field Required"}).min(1,{message:'Password field required'})
+    password: z.string({required_error: "Password Field Required"}).min(1,{message:'Password field required'}),
+    code: z.optional(z.string())
   });
 
   export const RegisterSchema = z.object({
@@ -16,6 +17,10 @@ export const LoginSchema = z.object({
   });
 
   export const PasswordResetSchema = z.object({
-    password: z.string({required_error: "Password field required"}).min(6,{message: "min of 6 charactors required"}),
+    password: z.string({required_error: "Password field required"}).min(5,{message: "min of 6 charactors required"}),
   });
+
+  export const TwoFactorSchema = z.object({
+    code: z.string().length(6,{message: "The code is 6 charactors long"})
+  })
 

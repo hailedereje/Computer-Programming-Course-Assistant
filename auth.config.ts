@@ -4,6 +4,7 @@ import { LoginSchema } from "./schemas/zod-validation";
 import { compareUserPassword, getUserByEmail } from "./data/user";
 import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
+import { getTwofactorConfirmationByUserId } from "./data/two-factor-confirmation";
 
 export default {
     providers: [
@@ -27,10 +28,17 @@ export default {
                     if(!user || !user.password) return null;
 
                     const {passwordMatch} = await compareUserPassword(password,user.password);
-                    if(passwordMatch) return user;
+                    if(passwordMatch && user) {
+                        return user;
+                    }
+                    
+                    const confirmation = await getTwofactorConfirmationByUserId(user.id);
+                    if(user.isTwoFactorEnabled && confirmation){
+                        return user;
+                    }
                 }
                 return null;
-            }
+            },
         })
     ]
 } satisfies NextAuthConfig

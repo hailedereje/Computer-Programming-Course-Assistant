@@ -2,19 +2,23 @@
 
 interface LoginResponse {
     error?: string,
-    success?: string
+    success?: string,
+    twoFactor?: boolean,
+    token?: string
 }
 
 import { signIn } from '@/auth';
-import { getUserByEmail } from '@/data/user';
-import { generateVarificationToken } from '@/lib/tokens';
+import { getTwofactorConfirmationByUserId } from '@/data/two-factor-confirmation';
+import { createTwoFactorToken, deleteTwoFactorToken, getTwoFactorTokenByEmail } from '@/data/two-factor-token';
+import { compareUserPassword, getUserByEmail } from '@/data/user';
+import { generateTwoFactorToken, generateVarificationToken } from '@/lib/tokens';
 import { DEFAULT_LOGIN_REDIRECT_PATH } from '@/route';
 import { LoginSchema } from '@/schemas/zod-validation';
 import { sendEmail } from '@/utils/email';
 import { AuthError } from 'next-auth';
 import * as z from 'zod';
 
-export async function login (values : z.infer<typeof LoginSchema> ) : Promise<LoginResponse>{
+export async function login (values : z.infer<typeof LoginSchema> ) : Promise<LoginResponse|null>{
     const validateFields = LoginSchema.safeParse(values);
 
     if(!validateFields.success) return {error:"Invalid fields"}
@@ -34,29 +38,42 @@ export async function login (values : z.infer<typeof LoginSchema> ) : Promise<Lo
         
         return {success: "Confirmation email sent!"}
     }
-    try{
-        await signIn("credentials",{
-            email,
-            password,
-            redirectTo: DEFAULT_LOGIN_REDIRECT_PATH
-        });
-        return {success:"signed in"}
-    }catch(error){
-        if( error instanceof AuthError){
-            switch (error.type) {
-                case "CredentialsSignin":
-                    return {error: "Invalid credentials"}
-                default: 
-                    return {error: "something went wrong!"}
+    
+        if(existingUser.isTwoFactorEnabled && existingUser.email){
+            const {passwordMatch} = await compareUserPassword(password,existingUser.password);
+            
+            if(!passwordMatch) return {error: "invalid credential"};  
+            
+            const ttoken = await getTwoFactorTokenByEmail(email);
+            if(ttoken) await deleteTwoFactorToken(ttoken.id);
+            
+            const twoFactorToken = await generateTwoFactorToken(email);
+
+            return {twoFactor: true,success:`2FA code sent to : ${email}`,token: existingUser.id}
+        }
+   
+        try{
+           await signIn("credentials",{
+                email,
+                password,
+                redirectTo: DEFAULT_LOGIN_REDIRECT_PATH
+            });
+            
+            return {success:"signed in"}
+
+        }catch(error){
+            if( error instanceof AuthError){
+                switch (error.type) {
+                    case "CredentialsSignin":
+                        return {error: "Invalid credentials"}
+                    default: 
+                        return {error: "other type of auth-error"}
             }
         }
+    
         throw error;
     }
+    
 
 }   
  
-export const socialLogin = async (provider : "google" | "github") => {
-    await signIn(provider,{
-        redirectTo:DEFAULT_LOGIN_REDIRECT_PATH
-    })
-}

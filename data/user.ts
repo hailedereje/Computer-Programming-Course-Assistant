@@ -2,13 +2,15 @@ import { db } from "@/lib/db"
 import bcrypt from "bcryptjs";
 import { deleteVarificationToken } from "./varification-token";
 import { deletePasswordResetToken } from "./password-reset";
+import { User } from "@prisma/client";
 
 export const createUser = async(name: string,email: string,password: string) => {
     
      await db.user.create({ data: { name,email,password } })
 }
-export const getUserByEmail = async(email : string) => {
-        return await db.user.findFirst({ where: { email } });          
+export const getUserByEmail = async(email : string):Promise<User> => {
+        const user = await db.user.findFirst({ where: { email } });
+        return user!;        
 }
 
 export const getUserById = async(id : string) => {

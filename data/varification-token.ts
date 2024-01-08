@@ -1,22 +1,11 @@
 "use server";
 import { db } from "@/lib/db"
+import { VarficationToken } from "@/schemas";
 
-interface VarficationToken{
-    id: string 
-    email: string 
-    token: string 
-    expiresAt: Date
-  }
+
 export const getVarificationTokenByToken = async (token: string)  =>{
-    try{
         const varification = await db.varficationToken.findUnique({ where: { token:token } });
-        // console.log(varification)
-        return varification;
-    }
-    catch(error){
-        // console.log(error)
-        return null;
-    }
+        return varification;   
 }
 
 export const getVarificationTokenByEmail = async (email: string) =>{
@@ -38,8 +27,7 @@ export const deleteVarificationToken = async (id: string) =>{
     }
 }
 
-export const createVarificationToken = async (email: string,token: string,expiresAt: Date):Promise<VarficationToken> =>{
-    try{
+export const createVarificationToken = async (email: string,token: string,expiresAt: Date):Promise<VarficationToken|null> =>{
         const varificationToken = await db.varficationToken.create({ 
             data:{
                 email,
@@ -48,9 +36,6 @@ export const createVarificationToken = async (email: string,token: string,expire
             } 
         });
         return varificationToken;
-    }
-    catch{
-        return null!;
-    }
+    
 }
 

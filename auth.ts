@@ -3,6 +3,8 @@ import authConfig from "@/auth.config"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { db } from "./lib/db"
 import { getUserById } from "./data/user"
+import { deleteTwoFactorConfirmationById, getTwofactorConfirmationById, getTwofactorConfirmationByUserId } from "./data/two-factor-confirmation"
+import { deleteTwoFactorToken } from "./data/two-factor-token"
 export const {
   handlers: { GET, POST },
   auth,
@@ -32,9 +34,15 @@ export const {
 
           const existingUser = await getUserById(user.id)
           
-          // preventing signin for not varified accounts
           if(!existingUser?.emailVerified) return false;
+
           
+          if(existingUser.isTwoFactorEnabled) {
+            const tconfirmation = await getTwofactorConfirmationByUserId(existingUser.id);
+            // console.log(tconfirmation);
+            if(!tconfirmation) return false;
+            await deleteTwoFactorConfirmationById(tconfirmation.id);
+          } 
           return true;
         },
         async jwt({token}) {

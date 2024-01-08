@@ -15,40 +15,42 @@ import {
 import { CardWrapper } from "./card-wrapper";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import {  PasswordResetSchema, ResetSchema } from "@/schemas/zod-validation";
+import {  PasswordResetSchema, ResetSchema, TwoFactorSchema } from "@/schemas/zod-validation";
 import { FormError, FormSuccess } from "./form-message";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { Loader2Icon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { newPasswordVarification } from "@/actions/new-varification";
+import { twoFactorLogin } from "@/actions/two-factor";
 
 
-export default function NewPasswordReset(){
+export default function TwoFactorAuth(){
     
     const [isPending,startTransition] = useTransition();
 
     const [error,setError] = useState<string|undefined>("");
     const [success,setSuccess] = useState<string|undefined>("");
-
-    const form = useForm<z.infer<typeof PasswordResetSchema>>({
-        resolver: zodResolver(PasswordResetSchema),
-        defaultValues:{}
-    });
-
-    const [loader,setLoader] = useState<boolean>(true);
-
+    
     const searchParams = useSearchParams();
     const token: string = searchParams.get("token") as string;
     console.log(token)
-    const onSubmit = (value: z.infer<typeof PasswordResetSchema>) => {
+
+    const form = useForm<z.infer<typeof TwoFactorSchema>>({
+        resolver: zodResolver(TwoFactorSchema),
+        defaultValues:{}
+    });
+
+
+    const onSubmit = (value: z.infer<typeof TwoFactorSchema>) => {
         setError("");
         setSuccess("")
+    
         if(!token){ setError("Missing Token"); return;}
+        console.log(value);
         startTransition(()=>{
-            newPasswordVarification(token,value).then(data =>{
+            twoFactorLogin(value,token).then(data =>{
                 setError(data.error);
                 setSuccess(data.success)
-                setLoader(false)
             })
         })
             
@@ -56,7 +58,7 @@ export default function NewPasswordReset(){
             
     return (
         <CardWrapper
-            headerLabel="Enter a new password"
+            headerLabel="enter 2FA code"
             backButtonLabel="Back to login"
             backButtonHref="/auth/login"
              >
@@ -66,17 +68,17 @@ export default function NewPasswordReset(){
                     <div className="space-y-4">
                         <FormField
                             control={form.control}
-                            name="password"
+                            name="code"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>New password</FormLabel>
+                                    <FormLabel>2FA code</FormLabel>
                                     <FormControl>
                                        <Input 
-                                            autoComplete="off"
-                                            type="password" 
+                                           
+                                            type="text" 
                                             disabled={isPending} 
                                             {...field} 
-                                            placeholder="******"/> 
+                                            placeholder="348945"/> 
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem> 

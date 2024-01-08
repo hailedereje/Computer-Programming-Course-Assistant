@@ -21,7 +21,7 @@ import { FormError, FormSuccess } from "./form-message";
 import { login } from "@/actions/login";
 import { useState, useTransition } from "react";
 import { Loader2Icon } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 
@@ -29,12 +29,13 @@ export default function LoginForm(){
     
     const searchParams = useSearchParams();
     const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ? "Email already in use with Differnt login provider":"";
-   
+    
+    const router = useRouter();
     const [isPending,startTransition] = useTransition();
 
     const [error,setError] = useState<string|undefined>("");
     const [success,setSuccess] = useState<string|undefined>("");
-
+    
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
         defaultValues:{
@@ -43,13 +44,18 @@ export default function LoginForm(){
         }
     });
 
+    // console.log(isPending)
     const onSubmit = (values : z.infer<typeof LoginSchema>) => {
         setError("");
         setSuccess("");
         startTransition(
             () => login(values).then(data => {
-                setError(data.error);
-                setSuccess(data.success)
+                    setError(data?.error);
+                    setSuccess(data?.success);
+                    if(data?.twoFactor){
+                     router.push(`/auth/two-factor?token=${data?.token}`);
+                    }
+                
             })
         )
         
@@ -64,7 +70,9 @@ export default function LoginForm(){
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}
                   className="space-y-6">
+                    
                     <div className="space-y-4">
+                   
                         <FormField
                             control={form.control}
                             name="email"
@@ -73,7 +81,7 @@ export default function LoginForm(){
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
                                        <Input 
-                                            autoComplete="off"
+                                            autoComplete="email"
                                             type="text" 
                                             disabled={isPending} 
                                             {...field} 
@@ -92,7 +100,7 @@ export default function LoginForm(){
                                     <FormLabel>Password</FormLabel>
                                     <FormControl>
                                        <Input 
-                                            autoComplete="password"
+                                            autoComplete="current-password"
                                             type="password"
                                             disabled={isPending} 
                                             {...field} 
@@ -105,11 +113,13 @@ export default function LoginForm(){
                                 </FormItem> 
                             )}
                         />
+                    
                     </div>
                     <FormError message={error || urlError}/>
                     <FormSuccess message={success}/>
                     <Button disabled={isPending} variant="blue" type="submit" className="w-full">
-                        {isPending && <span className="mr-4"><Loader2Icon className="h-4 w-4 animate-spin"/></span>}login
+                        {isPending && <span className="mr-4"><Loader2Icon className="h-4 w-4 animate-spin"/></span>}
+                        login
                     </Button> 
                 </form>
             </Form>

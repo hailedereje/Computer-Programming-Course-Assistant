@@ -51,3 +51,4 @@ export const newPasswordVarification = async(token: string,value: z.infer<typeof
 
     return {success: "password reseted successfully!"}
 }
+
