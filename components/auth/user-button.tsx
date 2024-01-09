@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "lucide-react";
+import { LogOutIcon, User } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -32,7 +32,7 @@ export const UserButton = () => {
             <DropdownMenuContent className="w-40" align="end">
                 <LogOut>
                     <DropdownMenuItem>
-                        Logout
+                       <LogOutIcon className="h-4 w-4 mr-2"/> Logout
                     </DropdownMenuItem>
                 </LogOut>
             </DropdownMenuContent>
