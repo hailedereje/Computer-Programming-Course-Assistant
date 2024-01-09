@@ -28,6 +28,7 @@ import Link from "next/link";
 export default function LoginForm(){
     
     const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get("callback");
     const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ? "Email already in use with Differnt login provider":"";
     
     const router = useRouter();
@@ -49,7 +50,7 @@ export default function LoginForm(){
         setError("");
         setSuccess("");
         startTransition(
-            () => login(values).then(data => {
+            () => login(values,callbackUrl).then(data => {
                     setError(data?.error);
                     setSuccess(data?.success);
                     if(data?.twoFactor){
@@ -81,10 +82,8 @@ export default function LoginForm(){
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
                                        <Input 
-                                            autoComplete="email"
-                                            type="text" 
                                             disabled={isPending} 
-                                            {...field} 
+                                            {...field} name="email"
                                             placeholder="example@gmail.com"/> 
                                     </FormControl>
                                     <FormMessage/>
@@ -99,12 +98,13 @@ export default function LoginForm(){
                                 <FormItem>
                                     <FormLabel>Password</FormLabel>
                                     <FormControl>
-                                       <Input 
-                                            autoComplete="current-password"
-                                            type="password"
-                                            disabled={isPending} 
-                                            {...field} 
-                                            placeholder="******"/> 
+                                        <FormItem>
+                                            <Input 
+                                                disabled={isPending} 
+                                                {...field} name="password"
+                                                placeholder="******"/> 
+                                        </FormItem>
+                                       
                                     </FormControl>
                                     <Button variant={"link"} size={"sm"} className="px-0 text-sm text-blue-400" asChild>
                                         <Link href={"/auth/reset"}>Forgot password ?</Link>

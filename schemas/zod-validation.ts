@@ -24,3 +24,26 @@ export const LoginSchema = z.object({
     code: z.string().length(6,{message: "The code is 6 charactors long"})
   })
 
+
+  export const SettingsSchema = z.object({
+    email: z.optional(z.string().email()),
+    password: z.optional(z.string()),
+    name: z.optional(z.string()),
+    role: z.enum(["ADMIN","USER"]),
+    isTwoFactorEnabled: z.optional(z.boolean()),
+    newPassword: z.optional(z.string().min(5)),
+    emailVarified: z.optional(z.date().nullable())
+  })
+  .refine(data => {
+    if(data.password && !data.newPassword) return false;
+
+    return true;
+  }, {message: "new password required ",path:["newPassword"]})
+
+  .refine(data => {
+    if(data.newPassword && !data.password) return false;
+
+    return true;
+  }, { message: "password required ",path: ["password"] }
+  )
+

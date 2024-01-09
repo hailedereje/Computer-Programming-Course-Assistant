@@ -25,7 +25,7 @@ import { register } from "@/actions/register";
 import { cn } from "@/lib/utils";
 
 
-export default function RegisterForm({signUp}:SignUpProps){
+export default function RegisterForm(){
     
     const [isPending,startTransition] = useTransition();
 
@@ -34,7 +34,11 @@ export default function RegisterForm({signUp}:SignUpProps){
 
     const form = useForm<z.infer<typeof RegisterSchema>>({
         resolver: zodResolver(RegisterSchema),
-        defaultValues:signUp
+        defaultValues:{
+            name: "",
+            email: "",
+            password: ""
+        }
     });
 
     const {isSubmitting,isValid} = form.formState;
@@ -60,48 +64,47 @@ export default function RegisterForm({signUp}:SignUpProps){
                 <form onSubmit={form.handleSubmit(onSubmit)}
                   className="space-y-6">
                     <div className="space-y-4">
-                    <div className="">
-                    <FormField
-                            control={form.control}
-                            name="name"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
-                                    <FormControl>
-                                       <Input disabled={isPending} {...field} placeholder="joe"/> 
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem> 
-                            )}
-                        /> 
+                        <FormField
+                                control={form.control}
+                                name="name"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Name</FormLabel>
+                                        <FormControl>
+                                        <Input disabled={isPending} {...field} placeholder="joe"/> 
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem> 
+                                )}
+                            /> 
 
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                       <Input disabled={isPending} {...field} placeholder="example@gmail.com"/> 
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem> 
-                            )}
-                        /> 
-                        </div>
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Password</FormLabel>
-                                    <FormControl>
-                                       <Input disabled={isPending} type="password" {...field} placeholder="******"/> 
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem> 
-                            )}
-                        />
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                        <Input disabled={isPending} {...field} placeholder="example@gmail.com"/> 
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem> 
+                                )}
+                            /> 
+                            
+                            <FormField
+                                control={form.control}
+                                name="password"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Password</FormLabel>
+                                        <FormControl>
+                                        <Input disabled={isPending} type="password" {...field} placeholder="******"/> 
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem> 
+                                )}
+                            />
                     </div>
                     <FormError message={error}/>
                     <FormSuccess message={success}/>

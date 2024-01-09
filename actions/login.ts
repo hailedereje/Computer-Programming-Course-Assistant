@@ -18,7 +18,7 @@ import { sendEmailVarification, sendTwoFactorEmail } from '@/utils/email';
 import { AuthError } from 'next-auth';
 import * as z from 'zod';
 
-export async function login (values : z.infer<typeof LoginSchema> ) : Promise<LoginResponse|null>{
+export async function login (values : z.infer<typeof LoginSchema> ,url?: any) : Promise<LoginResponse|null>{
     const validateFields = LoginSchema.safeParse(values);
 
     if(!validateFields.success) return {error:"Invalid fields"}
@@ -38,31 +38,29 @@ export async function login (values : z.infer<typeof LoginSchema> ) : Promise<Lo
         
         return {success: "Confirmation email sent!"}
     }
-    
-        if(existingUser.isTwoFactorEnabled && existingUser.email){
-            const {passwordMatch} = await compareUserPassword(password,existingUser.password);
-            
-            if(!passwordMatch) return {error: "invalid credential"};  
-            
-            const ttoken = await getTwoFactorTokenByEmail(email);
-            if(ttoken) await deleteTwoFactorToken(ttoken.id);
-            
-            const twoFactorToken = await generateTwoFactorToken(email);
-            try{
-                // await sendTwoFactorEmail(email,twoFactorToken.token);
-            }
-            catch{
-                return {error: "connection problem try again"}
-            }
-            
-            return {twoFactor: true,success:`2FA code sent to : ${email}`,token: existingUser.id}
+    const {passwordMatch} = await compareUserPassword(password,existingUser.password);
+    if(!passwordMatch) return {error: "invalid credentail"}
+
+    if(existingUser.isTwoFactorEnabled && existingUser.email){
+        const ttoken = await getTwoFactorTokenByEmail(email);
+        if(ttoken) await deleteTwoFactorToken(ttoken.id);
+        
+        const twoFactorToken = await generateTwoFactorToken(email);
+        try{
+            await sendTwoFactorEmail(email,twoFactorToken.token);
         }
+        catch{
+            return {error: "connection problem try again"}
+        }
+        
+        return {twoFactor: true,success:`2FA code sent to : ${email}`,token: existingUser.id}
+    }
    
         try{
            await signIn("credentials",{
                 email,
                 password,
-                redirectTo: DEFAULT_LOGIN_REDIRECT_PATH
+                redirectTo: url || DEFAULT_LOGIN_REDIRECT_PATH
             });
             
             return {success:"signed in"}
