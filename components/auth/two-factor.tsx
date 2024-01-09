@@ -37,7 +37,9 @@ export default function TwoFactorAuth(){
 
     const form = useForm<z.infer<typeof TwoFactorSchema>>({
         resolver: zodResolver(TwoFactorSchema),
-        defaultValues:{}
+        defaultValues:{
+            code:""
+        }
     });
 
 

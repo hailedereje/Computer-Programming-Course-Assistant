@@ -9,30 +9,24 @@ const password = process.env.MAIL_PASSWORD;
 
 export async function sendTwoFactorEmail(email: string ,token: string ) {
     const emailtem = render(<EmailVarification varification={token} title="Varify Email"/>)
-    //  await transporter.sendMail(
-    //     {
-    //         from: "Authjs team",
-    //         to: email,
-    //         subject: "Insert 2FA code to sign in",
-    //         html:`<p>Your @2FA code: ${token}`
-    //     }
-    //  )
+     await transporter.sendMail(
+        {
+            from: "Authjs team",
+            to: email,
+            subject: "Insert 2FA code to sign in",
+            html:`<p>Your @2FA code: ${token}`
+        }
+     )
     
 
   }
 
-export async function sendEmail(email: string ,token?: string ) {
+export async function sendEmailVarification(email: string ,token?: string ) {
 
     const confirmLink = `http://localhost:3000/auth/new-varification?token=${token}`
-    const emailtem = render(<EmailVarification varification={confirmLink} title="Varify Email"/>)
-    //  await transporter.sendMail(
-    //     {
-    //         from: "Authjs team",
-    //         to: email,
-    //         subject: "Confirm email to sign in",
-    //         html:emailtem
-    //     }
-    //  )
+    const emailItem = render(<EmailVarification varification={confirmLink} title="Varify Email"/>)
+    const subject = "varify your Email for auth-application"
+    await send(email,emailItem,subject)
     
 
   }
@@ -40,18 +34,23 @@ export async function sendEmail(email: string ,token?: string ) {
   export async function sendPasswordResetEmail(email: string ,token?: string ) {
 
     const resetLink = `http://localhost:3000/auth/new-password?token=${token}`
-    const emailtem = render(<EmailVarification varification={resetLink} title="Reset Password"/>)
-    //  await transporter.sendMail(
-    //     {
-    //         from: "Authjs team",
-    //         to: email,
-    //         subject: "Reset your password",
-    //         html:emailtem
-    //     }
-    //  )
+    const emailItem = render(<EmailVarification varification={resetLink} title="Reset Password"/>)
+    const subject = "reset ur password"
+    await send(email,emailItem,subject)
     
 
   } 
+
+  const send = async(email: string,emailItem: string,subject: string) => {
+     await transporter.sendMail(
+          {
+              from: "Authjs team",
+              to: email,
+              subject: subject,
+              html:emailItem
+          }
+       )
+  }
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',

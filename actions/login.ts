@@ -14,7 +14,7 @@ import { compareUserPassword, getUserByEmail } from '@/data/user';
 import { generateTwoFactorToken, generateVarificationToken } from '@/lib/tokens';
 import { DEFAULT_LOGIN_REDIRECT_PATH } from '@/route';
 import { LoginSchema } from '@/schemas/zod-validation';
-import { sendEmail } from '@/utils/email';
+import { sendEmailVarification, sendTwoFactorEmail } from '@/utils/email';
 import { AuthError } from 'next-auth';
 import * as z from 'zod';
 
@@ -30,7 +30,7 @@ export async function login (values : z.infer<typeof LoginSchema> ) : Promise<Lo
     if(!existingUser.emailVerified){
         const varification = await generateVarificationToken(existingUser.email)
         try{
-            await sendEmail(email,varification?.token);
+            await sendEmailVarification(email,varification?.token);
         
         }catch{
             return {error:"Connection problems try again"}
@@ -48,7 +48,13 @@ export async function login (values : z.infer<typeof LoginSchema> ) : Promise<Lo
             if(ttoken) await deleteTwoFactorToken(ttoken.id);
             
             const twoFactorToken = await generateTwoFactorToken(email);
-
+            try{
+                // await sendTwoFactorEmail(email,twoFactorToken.token);
+            }
+            catch{
+                return {error: "connection problem try again"}
+            }
+            
             return {twoFactor: true,success:`2FA code sent to : ${email}`,token: existingUser.id}
         }
    

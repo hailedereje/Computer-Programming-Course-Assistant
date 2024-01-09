@@ -31,7 +31,9 @@ export default function ResetForm(){
 
     const form = useForm<z.infer<typeof ResetSchema>>({
         resolver: zodResolver(ResetSchema),
-        defaultValues:{}
+        defaultValues:{
+            email: ""
+        }
     });
 
     const onSubmit = (value : z.infer<typeof ResetSchema>) => {

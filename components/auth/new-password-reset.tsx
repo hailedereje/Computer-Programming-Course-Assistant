@@ -32,7 +32,9 @@ export default function NewPasswordReset(){
 
     const form = useForm<z.infer<typeof PasswordResetSchema>>({
         resolver: zodResolver(PasswordResetSchema),
-        defaultValues:{}
+        defaultValues:{
+            password: ""
+        }
     });
 
     const [loader,setLoader] = useState<boolean>(true);

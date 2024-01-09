@@ -16,6 +16,8 @@ interface LoginResponse {
 }
 
 export const twoFactorLogin = async (value: z.infer<typeof TwoFactorSchema>,token: string): Promise<LoginResponse> => {
+    
+    
     const validateFields = TwoFactorSchema.safeParse(value);
     if(!validateFields.success) return {error: "invalid fields"};
 
@@ -32,21 +34,27 @@ export const twoFactorLogin = async (value: z.infer<typeof TwoFactorSchema>,toke
     const hasEx = confirmationCode.expiresAt < new Date();
     if(hasEx) return {error: "Code has expired"};
 
+    try{
     const codeOwner = await getUserByEmail(confirmationCode.email);
     if(!codeOwner) return {error: "Invalid code"};
     
     const confirmation = await getTwofactorConfirmationByUserId(user.id);
     if(confirmation) await deleteTwoFactorConfirmationById(confirmation.id);
 
-    await deleteTwoFactorTokenByToken(code);
-    await createTwoFactorConfirmation(token);
+    
+        await deleteTwoFactorTokenByToken(code);
+        await createTwoFactorConfirmation(user.id);
+    }
+    catch{
+        return {error: "deletion failed"}
+    }
+    
     
     const {email,password} = user;
     
     await signIn("credentials",{
             email,
             password,
-            redirectTo: DEFAULT_LOGIN_REDIRECT_PATH
         });
         
         return {success:"signed in"}   
