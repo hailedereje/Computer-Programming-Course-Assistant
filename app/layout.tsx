@@ -5,8 +5,8 @@ import { Toaster } from '@/components/ui/toaster'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'CPCA',
-  description: 'computer programming',
+  title: 'Auth',
+  description: 'Nextjs v5 auth implementation',
 }
 
 export default function RootLayout({
