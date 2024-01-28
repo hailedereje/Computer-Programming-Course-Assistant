@@ -1,26 +1,34 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from '@/components/ui/toaster'
-const inter = Inter({ subsets: ['latin'] })
+import Navbar from '@/components/home/navbar'
+import { SessionProvider } from 'next-auth/react'
+import { auth } from '@/auth'
+
+import { EdgeStoreProvider } from '../lib/edgestore';
+// const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Auth',
   description: 'Nextjs v5 auth implementation',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function RootLayout({children}: {children: React.ReactNode}) {
+
+  const session = await auth();
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <div className="min-h-screen flex items-center justify-center  bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-400 to-blue-800">
-          {children}
+      <body className="">
+      <SessionProvider session={session}>
+        <div className="min-h-screen flex flex-col space-y-4">
+          <Navbar/>
+          <EdgeStoreProvider>
+            {children}
+          </EdgeStoreProvider>
+          
         </div> 
         <Toaster/>
+        </SessionProvider>
       </body>
 
     </html>

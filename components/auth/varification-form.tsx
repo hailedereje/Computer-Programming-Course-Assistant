@@ -1,7 +1,7 @@
 "use client";
 import { SIGN_IN } from "@/route"
 import { CardWrapper } from "./card-wrapper"
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { newVarification } from "@/actions/new-varification";
 import { FormError, FormSuccess } from "./form-message";
@@ -14,7 +14,7 @@ const VarificationForm = () => {
 
     const searchParams = useSearchParams();
     const token: string = searchParams.get("token") as string;
-    
+    const router = useRouter()
     const onSubmit = useCallback(  ()=>{
             if(!token){ setError("Missing Token"); return;}
 
@@ -22,14 +22,14 @@ const VarificationForm = () => {
                   setSuccess(data.success);
                   setError(data.error);
                   setLoader(false);
+                  router.push("/")
                 }).catch(()=>{
                   setError("something went wrong")
                 })
-
+              
           },[token]);
 
   useEffect( ()=>  {
-      console.log("rendered")
       onSubmit()
     },[onSubmit])
   return (

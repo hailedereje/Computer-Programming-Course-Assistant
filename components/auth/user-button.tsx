@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/avatar";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { LogOut } from "./logout";
+import RedirectingButton from "./settings/redirecting-button";
 
 export const UserButton = () => {
     const user = useCurrentUser();
@@ -35,6 +36,11 @@ export const UserButton = () => {
                        <LogOutIcon className="h-4 w-4 mr-2"/> Logout
                     </DropdownMenuItem>
                 </LogOut>
+                <DropdownMenuItem>
+                    <RedirectingButton path="/settings">
+                    ⚙️ Profile
+                    </RedirectingButton>
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )

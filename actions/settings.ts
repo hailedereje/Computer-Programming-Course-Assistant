@@ -16,11 +16,10 @@ export const settings = async(values: z.infer<typeof SettingsSchema>) =>{
     const dbUser = await getUserById(user.id);
     if(!dbUser) return {error:"Unauthorized"}
 
-    if(user.isOAuth){
+    if(user){
         values.email = undefined;
         values.password = undefined;
         values.newPassword =undefined;
-        values.isTwoFactorEnabled = undefined;
     }
 
      if(values.email && values.email !== user.email) {
@@ -53,8 +52,6 @@ export const settings = async(values: z.infer<typeof SettingsSchema>) =>{
         name: values.name,
         email: values.email,
         password:values.password,
-        isTwoFactorEnabled:values.isTwoFactorEnabled,
-        role: values.role,
         emailVerified: values.emailVarified
     }});
      

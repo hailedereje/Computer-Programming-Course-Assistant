@@ -4,7 +4,6 @@ import { LoginSchema } from "./schemas/zod-validation";
 import { compareUserPassword, getUserByEmail } from "./data/user";
 import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-import { getTwofactorConfirmationByUserId } from "./data/two-factor-confirmation";
 
 export default {
     providers: [
@@ -32,10 +31,6 @@ export default {
                         return user;
                     }
                     
-                    const confirmation = await getTwofactorConfirmationByUserId(user.id);
-                    if(user.isTwoFactorEnabled && confirmation){
-                        return user;
-                    }
                 }
                 return null;
             },

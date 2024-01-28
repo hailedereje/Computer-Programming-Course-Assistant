@@ -3,7 +3,6 @@ import authConfig from "@/auth.config"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { db } from "./lib/db"
 import { getUserById } from "./data/user"
-import { deleteTwoFactorConfirmationById, getTwofactorConfirmationByUserId } from "./data/two-factor-confirmation"
 import { getAccountByUserId } from "./data/account"
 export const {
   handlers: { GET, POST },
@@ -34,15 +33,7 @@ export const {
 
           const existingUser = await getUserById(user.id)
           
-          if(!existingUser?.emailVerified) return false;
-
-          if(existingUser.isTwoFactorEnabled) {
-            
-            const tconfirmation = await getTwofactorConfirmationByUserId(existingUser.id);
-            if(!tconfirmation) return false;
-            
-            await deleteTwoFactorConfirmationById(tconfirmation.id);
-          } 
+          if(!existingUser?.emailVerified) return false
           return true;
         },
         async jwt({token}) {
@@ -57,8 +48,6 @@ export const {
           token.name = existingUser.name;
           token.email = existingUser.email;
           token.role = existingUser.role;
-          token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
-
           return token
         },
         async session ({token,session}) {
@@ -66,10 +55,8 @@ export const {
           if(token.sub && session.user) session.user.id = token.sub;
           if(token.role && session.user) session.user.role = token.role;
           if(session.user) {
-            session.user.isTwoFactorEnabled = token.isTwoFactorEnabled;
             session.user.name = token.name;
             session.user.email = token.email;
-            session.user.isOAuth = token.isOAuth;
           }
           
 

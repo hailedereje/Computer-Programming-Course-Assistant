@@ -23,12 +23,13 @@ import { useState, useTransition } from "react";
 import { Loader2Icon } from "lucide-react";
 import { register } from "@/actions/register";
 import { cn } from "@/lib/utils";
+import { redirect, useRouter } from "next/navigation";
 
 
 export default function RegisterForm(){
     
     const [isPending,startTransition] = useTransition();
-
+    const router = useRouter()
     const [error,setError] = useState<string|undefined>("");
     const [success,setSuccess] = useState<string|undefined>("");
 
@@ -50,6 +51,7 @@ export default function RegisterForm(){
             () => register(values).then(data => {
                 setError(data.error);
                 setSuccess(data.success)
+                router.push("/auth/login")
             })  
         )
     }

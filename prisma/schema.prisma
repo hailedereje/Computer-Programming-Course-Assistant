@@ -5,20 +5,21 @@ generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
-
 // datasource db {
-//   provider  = "mysql"
-//   url  	    = env("DATABASE_URL_LOCAL")
+//   provider  = "postgresql"
+//   url  	    = env("DATABASE_URL")
+//   directUrl = env("DIRECT_URL")
 // }
+
+datasource db {
+  provider  = "mysql"
+  url  	    = env("DATABASE_URL_LOCAL")
+}
 
 enum UserRole {
   ADMIN
   USER
+  INSTRUCTOR
 }
 model User {
   id            String    @id @default(cuid())
@@ -29,9 +30,7 @@ model User {
   password      String?
   role          UserRole @default(USER)
   accounts      Account[]
-
-  isTwoFactorEnabled Boolean @default(false)
-  twoFactorConfirmation TwoFactoryConfirmation?
+  courses       UserOnCourse[]
 }
 
 model Account {
@@ -68,16 +67,71 @@ model PasswordResetToken{
   expiresAt DateTime
   @@unique([email,token])
 }
-model TwoFactorToken{
+
+model Course {
   id String @id @default(cuid())
-  email String 
-  token String @unique
-  expiresAt DateTime
-  @@unique([email,token])
+  userId String?
+  title String? @db.Text
+  description String? @db.Text
+  users UserOnCourse[]
+  imageUrl String? @db.Text
+  isPublished Boolean? @default(false)
+  catagoryId String? @unique
+  catagory Catagory? @relation(fields: [catagoryId],references: [id],onDelete: Cascade)
+
+  chapter Chapter[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([catagoryId])
 }
-model TwoFactoryConfirmation {
+
+model UserOnCourse{
+  userId String 
+  user User @relation(fields: [userId],references: [id])
+  courseId String
+  course Course  @relation(fields: [courseId],references: [id])
+  @@id([userId,courseId])
+}
+
+model Catagory {
   id String @id @default(cuid())
-  userId String
-  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
-  @@unique([userId])
+  name String?
+  courses Course[]
+}
+
+model Chapter {
+  id String @id @default(cuid())
+  number Int?
+  name String?
+  headings Heading[]
+  courseId String? @unique
+  course Course? @relation(fields: [courseId],references: [id],onDelete: Cascade)
+
+}
+
+model Heading {
+  id String @id @default(cuid())
+  number Int?
+  name String?
+  chapterId String? @unique
+  chapter Chapter? @relation(fields: [chapterId],references: [id],onDelete: Cascade)
+  subHeading SubHeading[]
+}
+
+model SubHeading {
+  id        String    @id @default(cuid())
+  number    Int?
+  name      String?
+  headingId String? @unique
+  heading   Heading?  @relation(fields: [headingId], references: [id], onDelete: Cascade)
+  content   Content[]
+}
+
+model Content {
+  id           String     @id @default(cuid())
+  name         String?
+  contentId    String? @unique
+  subHeading   SubHeading? @relation(fields: [contentId], references: [id])
 }

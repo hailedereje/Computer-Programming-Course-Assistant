@@ -4,3 +4,7 @@ export const useCurrentUser = () => {
     const session = useSession();
     return session.data?.user;
 }
+
+export const isLoggedIn = () => {
+    return !!useCurrentUser;
+}

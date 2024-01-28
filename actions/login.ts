@@ -8,13 +8,12 @@ interface LoginResponse {
 }
 
 import { signIn } from '@/auth';
-import { getTwofactorConfirmationByUserId } from '@/data/two-factor-confirmation';
-import { createTwoFactorToken, deleteTwoFactorToken, getTwoFactorTokenByEmail } from '@/data/two-factor-token';
+
 import { compareUserPassword, getUserByEmail } from '@/data/user';
-import { generateTwoFactorToken, generateVarificationToken } from '@/lib/tokens';
+import { generateVarificationToken } from '@/lib/tokens';
 import { DEFAULT_LOGIN_REDIRECT_PATH } from '@/route';
 import { LoginSchema } from '@/schemas/zod-validation';
-import { sendEmailVarification, sendTwoFactorEmail } from '@/utils/email';
+import { sendEmailVarification } from '@/utils/email';
 import { AuthError } from 'next-auth';
 import * as z from 'zod';
 
@@ -40,21 +39,6 @@ export async function login (values : z.infer<typeof LoginSchema> ,url?: any) : 
     }
     const {passwordMatch} = await compareUserPassword(password,existingUser.password);
     if(!passwordMatch) return {error: "invalid credentail"}
-
-    if(existingUser.isTwoFactorEnabled && existingUser.email){
-        const ttoken = await getTwoFactorTokenByEmail(email);
-        if(ttoken) await deleteTwoFactorToken(ttoken.id);
-        
-        const twoFactorToken = await generateTwoFactorToken(email);
-        try{
-            await sendTwoFactorEmail(email,twoFactorToken.token);
-        }
-        catch{
-            return {error: "connection problem try again"}
-        }
-        
-        return {twoFactor: true,success:`2FA code sent to : ${email}`,token: existingUser.id}
-    }
    
         try{
            await signIn("credentials",{

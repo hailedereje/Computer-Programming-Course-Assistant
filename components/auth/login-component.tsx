@@ -11,7 +11,7 @@ interface LoginProps {
     asChild: boolean
 }
 
-export const LoginComponent = ({children,mode="modal",asChild} : LoginProps) => {
+export const LoginComponent = ({children,mode="redirect",asChild} : LoginProps) => {
        
     if(mode === "modal"){
 
@@ -34,3 +34,4 @@ export const LoginComponent = ({children,mode="modal",asChild} : LoginProps) => 
             </span>
         )
 }
+

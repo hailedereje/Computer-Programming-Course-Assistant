@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { SessionProvider } from "next-auth/react";
-import Navbar from "./_components/navbar";
 import { Metadata } from "next";
+import Navbar from "@/components/home/navbar";
 
 export const metadata: Metadata = {
     title: 'main',
@@ -13,8 +13,7 @@ const ProtectedPageLayout = async ({children} : {children:React.ReactNode}) => {
 
     return (
         <SessionProvider session={session}>
-            <div className="h-full w-full flex flex-col gap-y-10 items-center justify-center">
-                <Navbar/>
+            <div className="s">
                 {children}
             </div>
         </SessionProvider>

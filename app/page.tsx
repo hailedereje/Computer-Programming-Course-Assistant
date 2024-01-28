@@ -1,35 +1,19 @@
-"use client"
-import { Poppins } from 'next/font/google';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { LoginComponent } from '@/components/auth/login-component';
-import axios from 'axios';
+// import { Poppins } from 'next/font/google';
+import Navbar from '@/components/home/navbar';
+import { isLoggedIn } from '@/hooks/use-current-user';
+import Hero from '@/components/home/hero';
+import Course from '@/components/home/course';
+import { getAllCourse } from '@/data/courseModel';
 
-const font = Poppins({
-  subsets:["latin"],
-  weight:["600"]
-})
 
-export default function Home() {
+export default async function Home() {
+  const user = isLoggedIn()
+  const course = await getAllCourse();
+  const courseCover = course.map(c => ({title: c.title,description: c.description,id: c.id,image:c.imageUrl}))
   return (
-    <main className="flex full flex-col items-center justify-center ">
-      <div className="space-y-6 text-center">
-        <h1 className={cn("text-6xl font-semibold text-white drop-shadow-md",font.className)}>
-        🔐 Auth
-        </h1>
-        <p className="text-white text-lg">
-          A simple authetication service
-        </p>
-        <div>
-          <LoginComponent asChild>
-            <Button size={'lg'} variant={"secondary"}>
-              Sign in
-          </Button>
-          </LoginComponent>
-          
-        </div>
-      </div>
-
+    <main className="flex full flex-col space-y-10">
+      <Hero/>
+      <Course course={courseCover!}/>
     </main>
   )
 }

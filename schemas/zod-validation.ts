@@ -29,8 +29,6 @@ export const LoginSchema = z.object({
     email: z.optional(z.string().email()),
     password: z.optional(z.string()),
     name: z.optional(z.string()),
-    role: z.enum(["ADMIN","USER"]),
-    isTwoFactorEnabled: z.optional(z.boolean()),
     newPassword: z.optional(z.string().min(5)),
     emailVarified: z.optional(z.date().nullable())
   })
@@ -47,3 +45,18 @@ export const LoginSchema = z.object({
   }, { message: "password required ",path: ["password"] }
   )
 
+  export const NavbarDropDownSchema = z.object({
+    title: z.optional(z.string())
+  })
+
+export const TitleSchema = z.object({
+    title : z.string().min(1,{message : "Title is required"})
+});
+
+export const CatagorySchema = z.object({
+  catagoryId: z.string().min(1)
+})
+
+export const DescriptionSchema = z.object({
+  description: z.string().min(1,{message :"title required"})
+})

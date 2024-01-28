@@ -53,10 +53,6 @@ export default function LoginForm(){
             () => login(values,callbackUrl).then(data => {
                     setError(data?.error);
                     setSuccess(data?.success);
-                    if(data?.twoFactor){
-                     router.push(`/auth/two-factor?token=${data?.token}`);
-                    }
-                
             })
         )
         
@@ -101,7 +97,7 @@ export default function LoginForm(){
                                         <FormItem>
                                             <Input 
                                                 disabled={isPending} 
-                                                {...field} name="password"
+                                                {...field} type="password"
                                                 placeholder="******"/> 
                                         </FormItem>
                                        

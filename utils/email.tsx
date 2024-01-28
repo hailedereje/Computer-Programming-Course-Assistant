@@ -8,19 +8,6 @@ const username = process.env.MAIL;
 const password = process.env.MAIL_PASSWORD;
 const domain = process.env.NEXT_APP_URL
 
-export async function sendTwoFactorEmail(email: string ,token: string ) {
-    const emailtem = render(<EmailVarification varification={token} title="Varify Email"/>)
-     await transporter.sendMail(
-        {
-            from: "Authjs team",
-            to: email,
-            subject: "Insert 2FA code to sign in",
-            html:`<p>Your @2FA code: ${token}`
-        }
-     )
-    
-
-  }
 
 export async function sendEmailVarification(email: string ,token?: string ) {
 

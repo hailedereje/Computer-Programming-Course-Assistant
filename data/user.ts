@@ -5,21 +5,40 @@ import { deletePasswordResetToken } from "./password-reset";
 import { User } from "@prisma/client";
 
 export const createUser = async(name: string,email: string,password: string) => {
-    
-     await db.user.create({ data: { name,email,password } })
+        try{
+                await db.user.create({ data: { name,email,password } })
+        }catch{
+            return null!;
+        }
+     
 }
 export const getUserByEmail = async(email : string):Promise<User> => {
-        const user = await db.user.findFirst({ where: { email } });
-        return user!;        
+        try{
+             const user = await db.user.findFirst({ where: { email } });
+             return user!;   
+        }catch{
+                return null!;
+        }
+                
 }
 
 export const getUserById = async(id : string) => {
-        return await db.user.findUnique({ where: { id } });
+        try{
+            return await db.user.findUnique({ where: { id } });
+        }catch{
+             return null!;
+        }
+        
 }
 
 export const compareUserPassword = async(password: string,hashedPassword: string) =>{
-    const passwordMatch = await bcrypt.compare(password,hashedPassword);
-    return {passwordMatch};
+        try{
+             const passwordMatch = await bcrypt.compare(password,hashedPassword);
+             return {passwordMatch};
+        }catch{
+             return null!;
+        }
+    
 }
 
 export const varifyUserEmail = async(id: string,email: string,tokenId: string) =>{
